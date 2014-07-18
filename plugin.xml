@@ -1,6 +1,7 @@
 <plugin id = "zhouxuan">
 <require>
 <import plugin="org.eclipse.ui"/>
+<import plugin = "org.eclipse.jdt.core"/>
 </require>
 <extension point="org.eclipse.ui.actionSets">
   <actionSet
@@ -13,5 +14,18 @@
           toolbarPath="helloGroup">
     </action>
   </actionSet>
+</extension>
+
+<extension point="org.eclipse.ui.popupMenus">
+  <objectContribution
+    id="org.eclipse.contribution.junit.runtest"
+    objectClass="org.eclipse.jdt.core.IType">
+    <action
+      id="org.eclipse.contribution.junit.runtest.action"
+      label="Run Test"
+      class="zhouxuan.JunitAction"
+      enablesFor="1">
+    </action>
+  </objectContribution>
 </extension>
 </plugin>
