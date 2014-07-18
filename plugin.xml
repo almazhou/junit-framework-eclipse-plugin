@@ -1,0 +1,17 @@
+<plugin id = "zhouxuan">
+<require>
+<import plugin="org.eclipse.ui"/>
+</require>
+<extension point="org.eclipse.ui.actionSets">
+  <actionSet
+    id="org.eclipse.contribution.hello.actionSet"
+    label="Hello Action Set">
+    <action
+          class="zhouxuan.HelloAction"
+          id="org.eclipse.contribution.hello.HelloAction"
+          label="Hello"
+          toolbarPath="helloGroup">
+    </action>
+  </actionSet>
+</extension>
+</plugin>
