@@ -36,4 +36,10 @@
 class = "zhouxuan.JunitAction$Listener">
 </listener>
 </extension>
+
+<runtime>
+<library name = "zhouxuan.jar">
+<export name = "*"/>
+</library>
+</runtime>
 </plugin>
