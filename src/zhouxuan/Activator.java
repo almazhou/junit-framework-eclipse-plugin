@@ -1,6 +1,7 @@
 package zhouxuan;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -8,6 +9,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPluginRegistry;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.junit.ITestRunListener;
@@ -74,26 +76,69 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public void fireTestsStarted(int count){
-		for(ITestRunListener listener : getListeners()){
-			listener.testRunStarted(count);
+		for(Iterator all = getListeners().iterator(); all.hasNext();){
+			final ITestRunListener each =(ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable(){
+				public void handleException(Throwable exception){
+					all.remove();
+				};
+				public void run() throws Exception{	
+					each.testRunStarted(count);
+				}
+			};
+			
+			Platform.run(runnable);
 		}
+
 	}
 	
 	public void fireTestsFinished(){
-		for(ITestRunListener listener : getListeners()){
-			listener.testRunTerminated();
+		for(Iterator all = getListeners().iterator(); all.hasNext();){
+			final ITestRunListener each =(ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable(){
+				public void handleException(Throwable exception){
+					all.remove();
+				};
+				public void run() throws Exception{
+					each.testRunTerminated();
+				}
+			};
+			
+			Platform.run(runnable);
 		}
+		
 	}
 	public void fireTestStarted(String klass,String methodName){
-		for(ITestRunListener listener : getListeners()){
-			listener.testStarted(klass,methodName);
+		for(Iterator all = getListeners().iterator(); all.hasNext();){
+			final ITestRunListener each =(ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable(){
+				public void handleException(Throwable exception){
+					all.remove();
+				};
+				public void run() throws Exception{
+					each.testStarted(klass,methodName);	
+				}
+			};
+			
+			Platform.run(runnable);
 		}
 	}
 	
 	public void fireTestFailed(String klass,String method,String trace){
-		for(ITestRunListener listener : getListeners()){
-			listener.testFailed(0,klass,method,trace);
+		for(Iterator all = getListeners().iterator(); all.hasNext();){
+			final ITestRunListener each =(ITestRunListener) all.next();
+			ISafeRunnable runnable = new ISafeRunnable(){
+				public void handleException(Throwable exception){
+					all.remove();
+				};
+				public void run() throws Exception{
+					each.testFailed(0,klass,method,trace);
+				}
+			};
+			
+			Platform.run(runnable);
 		}
+		
 	}
 
 	private List<ITestRunListener> getListeners() {
