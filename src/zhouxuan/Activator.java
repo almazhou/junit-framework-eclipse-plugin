@@ -1,7 +1,20 @@
 package zhouxuan;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IPluginRegistry;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.junit.ITestRunListener;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import zhouxuan.JunitAction.Listener;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -13,6 +26,9 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+	private List listeners;
+	private static final String listenerId="zhouxuan.listeners";
+	
 	
 	/**
 	 * The constructor
@@ -46,5 +62,84 @@ public class Activator extends AbstractUIPlugin {
 	public static Activator getDefault() {
 		return plugin;
 	}
+	
+	public void addTestListener(ITestRunListener listener) {
+		getListeners().add(listener);
+		
+	}
+
+	public void removeTestListener(ITestRunListener listener) {
+		getListeners().remove(listener);
+		
+	}
+	
+	public void fireTestsStarted(int count){
+		for(ITestRunListener listener : getListeners()){
+			listener.testRunStarted(count);
+		}
+	}
+	
+	public void fireTestsFinished(){
+		for(ITestRunListener listener : getListeners()){
+			listener.testRunTerminated();
+		}
+	}
+	public void fireTestStarted(String klass,String methodName){
+		for(ITestRunListener listener : getListeners()){
+			listener.testStarted(klass,methodName);
+		}
+	}
+	
+	public void fireTestFailed(String klass,String method,String trace){
+		for(ITestRunListener listener : getListeners()){
+			listener.testFailed(0,klass,method,trace);
+		}
+	}
+
+	private List<ITestRunListener> getListeners() {
+		if(listeners == null){
+			System.out.println("^^&&&&&&&&");
+			listeners = computeListeners();
+		}
+		return listeners;
+	}
+
+	private List computeListeners() {
+		IPluginRegistry registry = Platform.getPluginRegistry();
+		
+		IExtensionPoint extensionPoint =
+				registry.getExtensionPoint(listenerId);
+		
+		IExtension[] extensions = extensionPoint.getExtensions();
+		
+		List results = new ArrayList();
+		
+		for(int i = 0;i< extensions.length; i++){
+			IConfigurationElement[] elements = 
+					extensions[i].getConfigurationElements();
+		    for(int j= 0; j < elements.length; j++){
+		    	try{
+		    		Object listener = elements[j].createExecutableExtension("class");
+		    		if(listener instanceof ITestRunListener){
+		    			results.add(listener);
+		    		}
+		    	}
+		    	catch(CoreException e){
+		    		e.printStackTrace();
+		    		
+		    	}
+		    }
+		  
+		}
+		System.out.println("^^&&&&&&&&");
+		System.out.println(results);
+		  return results;
+	}
+
+	public void run(IType type) {
+		new TestRunner().run(type);
+		
+	}
+
 
 }

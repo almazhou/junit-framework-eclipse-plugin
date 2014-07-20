@@ -28,4 +28,12 @@
     </action>
   </objectContribution>
 </extension>
+
+<extension-point id = "listeners" name = "Test Listeners"/>
+
+<extension point = "zhouxuan.listeners">
+<listener
+class = "zhouxuan.JunitAction$Listener">
+</listener>
+</extension>
 </plugin>
